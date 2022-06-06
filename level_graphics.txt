@@ -1,0 +1,14 @@
+DATA_DEA932	forest_level_tiledata
+DATA_DF0870	ship_hold_level_tiledata
+DATA_DF3059	wasp_hive_level_tiledata
+DATA_DF8116	ship_deck_level_tiledata
+DATA_DFD537	ship_mast_level_tiledata
+DATA_E02195	carnival_level_tiledata
+DATA_E07174	lava_level_tiledata
+DATA_E0CF31	mine_level_tiledata
+DATA_E106AF	swamp_level_tiledata
+DATA_E15B05	brambles_level_tiledata
+DATA_E1EFDE	krocodile_kore_level_tiledata
+DATA_E23790	k_rool_duel_level_tiledata
+DATA_E29E5F	ice_level_tiledata
+DATA_E2E556	jungle_level_tiledata

@@ -1,0 +1,4 @@
+DATA_FD416E	secret_ending_beam_sprite_palette
+DATA_FD418E	secret_ending_isle_sprite_palette
+DATA_FD6B8C	barrel_good_bad_sprite_palette
+DATA_FD6682	global_sprite_palette
