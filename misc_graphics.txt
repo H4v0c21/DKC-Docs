@@ -1,3 +1,3 @@
 DATA_FD88CD	hud_tiledata
-DATA_FD8F4D	star_tiledata
+DATA_FD8F4D	bonus_star_tiledata
 DATA_ED57EF	text_tiledata
