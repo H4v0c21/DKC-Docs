@@ -42,6 +42,9 @@ DATA_ED78B5	file_select_stereo_tilemap
 DATA_FB0000	file_select_dk_coin_tiledata
 DATA_FB0400	file_select_krem_coin_tiledata
 
+DATA_EC4749	game_select_modes_tilemap
+DATA_EC4AAD	game_select_music_test_tilemap
+DATA_EC4C1C	game_select_cheat_mode_tilemap
 DATA_EC4D40	game_select_tiledata
 
 DATA_EC83A0	file_select_bg_tiledata
