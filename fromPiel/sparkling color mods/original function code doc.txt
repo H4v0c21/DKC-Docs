@@ -1,0 +1,112 @@
+; function : mine sparkling effect animated palette update
+
+; description : computes from base palette to get updated palette by according the current frame 
+
+; RAM : $80D655 ; ASM : CODE_80D695 ; ROM : 0x00D655
+; size : 136 ; 0x88
+
+; used registers : A, X
+; function calls inside : yes maybe at the end of main process (need to investigate)
+
+; doc status : uncompleted
+
+
+
+    LDA $2A                                    ; > get global_frame_counter (disassembly ref)
+
+    ASL                                        ; \
+    AND #$003F                                 ; |
+    BIT #$0020                                 ; |
+    BEQ $80D663                                ; | compute main substraction factor (for the current frame)
+    EOR #$003F                                 ; |
+    CMP #$0020                                 ; |
+    BCC $80D66B                                ; |
+    LDA #$0020                                 ; /
+
+    STA $32                                    ; > store red substraction factor (already computed)
+  
+    ASL                                        ; \
+    ASL                                        ; | compute and store blue substraction factor
+    XBA                                        ; |
+    STA $36                                    ; /
+  
+    XBA                                        ; \
+    ASL                                        ; | compute and store green substraction factor
+    ASL                                        ; |
+    ASL                                        ; |
+    STA $34                                    ; /
+  
+    LDX #$0000                                 ; > X register is set to 0 as loop counter
+  
+    ; $80D67B For_each_2bpp_palette_colors:    ; for (i=0; i<30; i+=2) {
+                                               ; FD2270 is the index 1 of the palette color
+                                               ;   (FD226E is the true palette start offset)
+                                               ; this loop process 15 colors
+
+        LDA $FD2270,X                          ; \ get red component of base palette color
+        AND #$001F                             ; /
+        SEC                                    ; \
+        SBC $32                                ; |
+        SBC $32                                ; | subtract for red component (4 times)
+        SBC $32                                ; |
+        SBC $32                                ; /
+        BPL $80D690                            ; \ clamp red component to 0 if it is less than 0
+        LDA #$0000                             ; /
+        STA $38                                ; > store the just computed red component in the final color
+      
+        LDA $FD2270,X                          ; \ get green component of base palette color
+        AND #$03E0                             ; /
+        SEC                                    ; \
+        SBC $34                                ; |
+        SBC $34                                ; | subtract for green component (4 times)
+        SBC $34                                ; |
+        SBC $34                                ; /
+        BPL $80D6A7                            ; \ clamp green component to 0 if it is less than 0
+        LDA #$0000                             ; /
+        TSB $38                                ; > store the just computed green component in the final color
+      
+        LDA $FD2270,X                          ; \ get blue component of base palette color
+        AND #$7C00                             ; /
+        SEC                                    ; \ subtract for blue component (1 time)
+        SBC $36                                ; /
+        BPL $80D6B8                            ; \ clamp blue component to 0 if it is less than 0
+        LDA #$0000                             ; /
+        ORA $38                                ; > store the just computed blue component in the final color
+      
+        STA $7E8014,X                          ; > store final color in the new palette
+
+    INX                                        ; \
+    INX                                        ; | end of loop
+    CPX #$001E                                 ; | keep going if X register is less than 0x1E (30bytes 15colors)
+    BNE $80D67B                                ; /
+
+    LDA $2A                                    ; |
+    AND #$0020                                 ; |
+    BEQ $80D6D6                                ; |
+    JSR $B0FE                                  ; | this block is not investigeted yet
+    AND #$0001                                 ; |
+    STA $7E8012                                ; |
+    LDA $7E8012                                ; |
+    BEQ $80D6DD                                ; |
+    RTS                                        ; |
+
+
+
+; bin str :
+; A52A0A293F008920
+; 00F003493F00C920
+; 009003A920008532
+; 0A0AEB8536EB0A0A
+; 0A8534A20000BF70
+; 22FD291F0038E532
+; E532E532E5321003
+; A900008538BF7022
+; FD29E00338E534E5
+; 34E534E5341003A9
+; 00000438BF7022FD
+; 29007C38E5361003
+; A9000005389F1480
+; 7EE8E8E01E00D0B6
+; A52A292000F00A20
+; FEB02901008F1280
+; 7EAF12807EF00160
