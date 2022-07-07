@@ -1,6 +1,6 @@
 ; function : load level map structure references (pointers and attribute data), from rom to the wram.
 
-; description : load, data pointer(tilemap, mapchip, collision, room dimension, palette),
+; description : load, data pointers(tilemap, mapchip, collision, room dimension, palette),
                       routines(scoll controling method),
                       data(collision mapchip size, vram destination address, tilemap type).
 
