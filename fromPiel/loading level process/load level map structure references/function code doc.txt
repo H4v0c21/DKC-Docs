@@ -1,0 +1,210 @@
+; function : load level map structure references (pointers and attribute data), from rom to the wram.
+
+; description : load, data pointer(tilemap, mapchip, collision, room dimension, palette),
+                      routines(scoll controling method),
+                      data(collision mapchip size, vram destination address, tilemap type).
+
+; RAM : $B5BCA8 ; ASM : CODE_B5BCA8 ; ROM : 0x35BCA8
+; size : 93 ; 0x5D
+
+; used registers : A, Y, X
+; function calls inside : no
+
+; doc status : complete (waiting for validation)
+
+; ROM version reference : 1.0 and 1.1
+
+CODE_B5BCA8:
+	PHB						;$B5BCA8  \  push current bank register (DB) to the stack (SP)
+	PHK						;$B5BCA9   | transfer PC bank to the bank register DB
+	PLB						;$B5BCAA  /  (ROM resources are in B5 bank)
+
+	STA $32					;$B5BCAB  \
+	ASL A					;$B5BCAD   | $32 = current level theme index
+	TAY						;$B5BCAE   | Y = current level theme index * 2
+	CLC						;$B5BCAF   | X = current level theme index * 3
+	ADC $32					;$B5BCB0   |
+	TAX						;$B5BCB2  /
+
+	LDA DATA_B5BAEF,x		;$B5BCB3  \  $98 = curr lvl main tlmp32x32 pointer
+	STA $98					;$B5BCB6  /
+
+	SEP #$20				;$B5BCB8  \
+	LDA DATA_B5BB30,x		;$B5BCBA   |
+	XBA						;$B5BCBD   | $9A = curr lvl main tlmp32x32 bank
+	LDA DATA_B5BAF1,x		;$B5BCBE   | $9B = curr lvl main mapchip bank
+	REP #$20				;$B5BCC1   |
+	STA $9A					;$B5BCC3  /
+
+	LDA DATA_B5BB97,x		;$B5BCC5  \  $9C = curr lvl collision mapchip pointer
+	STA $9C					;$B5BCC8  /
+	LDA DATA_B5BB99,x		;$B5BCCA  \
+	AND #$00FF				;$B5BCCD   | $9E = curr lvl collision mapchip bank
+	ORA #$8000				;$B5BCD0   | $9F = 0x80 (collision mapchip bank flag)
+	STA $9E					;$B5BCD3  /
+
+	LDA DATA_B5BB2E,x		;$B5BCD5  \  $17B4 = curr lvl main mapchip pointer
+	STA $17B4				;$B5BCD8  /
+
+	LDA DATA_B5BB6D,y		;$B5BCDB  \  $17B6 = curr lvl main tlmp32x32 vram dest addr
+	STA $17B6				;$B5BCDE  /
+
+	LDA DATA_B5BBD6,y		;$B5BCE1  \  $A0 = curr lvl collision mapchip size (tile32x32 count)
+	STA $A0					;$B5BCE4  /
+
+	LDA DATA_B5BC00,y		;$B5BCE6  \  $17B2 = curr lvl scroll control method
+	STA $17B2				;$B5BCE9  /
+
+	LDA $0A8E				;$B5BCEC  \
+	BNE CODE_B5BCF7			;$B5BCEF   | if ($0A8E == 0)
+	LDA DATA_B5BC2A,y		;$B5BCF1   |   $0A8E = curr lvl default palette
+	STA $0A8E				;$B5BCF4   | else
+CODE_B5BCF7:				;         /    $0A8E = specific palette
+
+	LDA DATA_B5BC7E,y		;$B5BCF7  \
+	STA $0B84				;$B5BCFA  /  $0B84 = curr lvl main tlmp32x32 settings table pointer
+
+	LDA DATA_B5BC54,y		;$B5BCFD  \
+	STA $0B86				;$B5BD00  /  $0B86 = curr lvl main tlmp32x32 type
+
+	PLB						;$B5BD03  >  pull back the bank from the stack
+	RTL						;$B5BD04  >  return
+
+
+
+WRAM state before :
+
+	$0523 = current_level.theme_index
+
+
+
+register input :
+
+	A = current_level.theme_index (= $0523)
+
+
+
+WRAM input :
+
+	none
+
+
+
+ROM input :
+
+	DATA_B5BAEF : level_themes.tilemap32x32_address_table
+		(pattern entry, 3bytes : [pointer.l][pointer.h][bank])
+		// SGM2 label : "Tilemap address"
+
+	DATA_B5BB2E : level_themes.mapchip8x8_address_table
+		(pattern entry, 3bytes : [pointer.l][pointer.h][bank])
+		// SGM2 label : "Mapchip contruction data address"
+
+	DATA_B5BB97 : level_themes.collision_mapchip16x32_address_table
+		(pattern entry, 3bytes : [pointer.l][pointer.h][bank])
+		// SGM2 label : "Terrain collision construction data address"
+
+	DATA_B5BB6D : level_themes.tilemap32x32_vram_destination_table
+		(pattern entry, 2bytes : [dest.l][dest.h])
+		// vram destination offset divided by 2
+		// SGM2 label : "Tilemap VRAM entry for terrain"
+
+	DATA_B5BBD6 : level_themes.collision_mapchip16x32_32x32tilecount_table
+		(pattern entry, 2bytes : [count.l][count.h])
+		// tile count of collision_mapchip16x32 in 32x32tile unit
+		// SGM2 label : "Terrain collision data size"
+
+	DATA_B5BC00 : level_themes.scroll_controling_method_table
+		(pattern entry, 2bytes : [pointer.l][pointer.h])
+		// unknown method working
+		// SGM2 label : "Scroll controling method"
+
+	DATA_B5BC2A : level_themes.default_palette_address_table
+		(pattern entry, 2bytes : [pointer.l][pointer.h])
+		// SGM2 label : "Base palette"
+
+	DATA_B5BC7E : level_themes.tilemap32x32_room_dimension_settings_table_pointer_table
+		(pattern entry, 2bytes : [pointer.l][pointer.h])
+		// SGM2 label : "Level arrangement data address"
+
+	DATA_B5BC54 : level_themes.tilemap32x32_type_table
+		(pattern entry, 2bytes : [type.l][type.h])
+		// SGm2 label : "Tilemap type"
+
+
+
+register output :
+
+	X = current_level.theme_index * 3
+
+	Y = current_level.theme_index * 2
+
+
+
+WRAM output (original process order) :
+
+	$0523, 1byte  = current_level.theme_index,                           got from unknown yet
+
+	$0032, 1byte  = current_level.theme_index,                           $000523 [0]
+
+	$0098, 2bytes = current_level.main_tilemap32x32.pointer,             DATA_B5BAEF [X] [X+1]
+
+	$009A, 1byte  = current_level.main_tilemap32x32.bank,                DATA_B5BAEF [X+2]
+
+	$009B, 1byte  = current_level.main_mapchip8x8.bank,                  DATA_B5BB2E [X+2]
+
+	$009C, 2bytes = current_level.collision_mapchip16x32.pointer,        DATA_B5BB97 [X] [X+1]
+
+	$009E, 1byte  = current_level.collision_mapchip16x32.bank,           DATA_B5BB97 [X+2]
+
+	$009F, 1byte  = current_level.collision_mapchip16x32.bankflag,       0x80 (value)
+
+	$17B4, 2bytes = current_level.main_mapchip8x8.pointer,               DATA_B5BB2E [X] [X+1]
+
+	$17B6, 2bytes = current_level.main_tilemap32x32.vram_dest,           DATA_B5BB6D [Y] [Y+1]
+
+	$00A0, 2bytes = current_level.collision_mapchip16x32.size,           DATA_B5BBD6 [Y] [Y+1]
+
+	$17B2, 2bytes = current_level.scroll_controling_method,              DATA_B5BC00 [Y] [Y+1]
+
+	$0A8E, 2bytes = current_level.palette_offset,                        DATA_B5BC2A [Y] [Y+1] // default case, $0A8E is 0
+	$0A8E, 2bytes = current_level.palette_offset,                        $000A8E [0] [1]       // specific case, $0A8E was been set before
+
+	$0B84, 2bytes = current_level.room_dimension_settings_table_pointer, DATA_B5BC7E [Y] [Y+1] // room dimension settings are for main_tilemap32x32
+
+	$0B86, 2bytes = current_level.main_tilemap32x32.type,                DATA_B5BC54 [Y] [Y+1]
+
+
+
+WRAM output (sorted by wram address order) :
+
+	$0032, 1byte  = current_level.theme_index,                           $000523 [0]
+
+	$0098, 2bytes = current_level.main_tilemap32x32.pointer,             DATA_B5BAEF [X] [X+1]
+
+	$009A, 1byte  = current_level.main_tilemap32x32.bank,                DATA_B5BAEF [X+2]
+
+	$009B, 1byte  = current_level.main_mapchip8x8.bank,                  DATA_B5BB2E [X+2]
+
+	$009C, 2bytes = current_level.collision_mapchip16x32.pointer,        DATA_B5BB97 [X] [X+1]
+
+	$009E, 1byte  = current_level.collision_mapchip16x32.bank,           DATA_B5BB97 [X+2]
+
+	$009F, 1byte  = current_level.collision_mapchip16x32.bankflag,       0x80 (value)
+
+	$00A0, 2bytes = current_level.collision_mapchip16x32.size,           DATA_B5BBD6 [Y] [Y+1]
+
+	$0523, 1byte  = current_level.theme_index,                           got from unknown yet
+
+	$0A8E, 2bytes = current_level.palette_offset,                        DATA_B5BC2A [Y] [Y+1] // default case, $0A8E is 0
+	$0A8E, 2bytes = current_level.palette_offset,                        $000A8E [0] [1]       // specific case, $0A8E was been set before
+
+	$0B84, 2bytes = current_level.room_dimension_settings_table_pointer, DATA_B5BC7E [Y] [Y+1] // room dimension settings are for main_tilemap32x32
+
+	$0B86, 2bytes = current_level.main_tilemap32x32.type,                DATA_B5BC54 [Y] [Y+1]
+
+	$17B2, 2bytes = current_level.scroll_controling_method,              DATA_B5BC00 [Y] [Y+1]
+
+	$17B4, 2bytes = current_level.main_mapchip8x8.pointer,               DATA_B5BB2E [X] [X+1]
+
+	$17B6, 2bytes = current_level.main_tilemap32x32.vram_dest,           DATA_B5BB6D [Y] [Y+1]
