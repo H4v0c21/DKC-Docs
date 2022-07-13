@@ -1,0 +1,274 @@
+1.1 CODE_BBAF0C
+
+
+
+
+; can be called from :
+	LDA $08A6            ;$BB927D   | A.h = reserved byte [curr lvl index] ; A.l = unknown byte
+	XBA                  ;$BB9280   | A.h = unknown byte                   ; A.l = reserved byte [curr lvl index]
+	ORA level_number     ;$BB9281   | A.h = unknown byte                   ; A.l = current level index
+	JSL CODE_BBAF0C      ;$BB9283   |
+
+; or/and can be called from :
+	LDA level_number     ;$BB8244   |
+	JSL CODE_BBAF0C      ;$BB8246   |
+
+
+
+
+
+; main process description : load current level (entrance "linking") settings and ISD
+; note : Y = rom read pointer ; X = wram write pointer
+
+
+
+
+; PART 1 :
+
+; part 1, about : room type,
+;                 current level index,
+;                 current level unknown byte yet (probabely coming from world map, maybe lvl style "familly kong member stage" flag),
+;                 current level ISD pointer
+; part 1, code :
+
+CODE_BBAF0C:                           ;
+    LDX #$0515                         ;$BBAF0C  \  X = wram write pointer [curr lvl room type]
+CODE_BBAF0F:                           ;          |
+    STA $34                            ;$BBAF0F   | $34 = current level index ; $35 = unknown byte
+    XBA                                ;$BBAF11   | A.h = current level index ; A.l = unknown byte
+    AND #$00FF                         ;$BBAF12   | A = unknown byte
+    STA $32                            ;$BBAF15   | $32 = curr lvl unknown byte ; ($33 = 0)
+    LDA $34                            ;$BBAF17   | A.h = unknown byte          ; A.l = current level index
+    AND #$00FF                         ;$BBAF19   | A = current level index
+    ASL A                              ;$BBAF1C   | A = current level index * 2
+    TAY                                ;$BBAF1D  /  Y = current level index * 2 (rom read pointer [curr lvl settings pointer])
+    PHB                                ;$BBAF1E  \
+    %pea_shift_dbr(DATA_FD0000)        ;$BBAF1F   | push bank on the stack
+    PLB                                ;$BBAF22   | set bank FD
+    PLB                                ;$BBAF23  /
+    LDA.w DATA_FD0000,y                ;$BBAF24   | A = current level settings pointer
+    TAY                                ;$BBAF27   | Y = rom read pointer [curr lvl settings room type]
+    LDA.w DATA_FD0000,y                ;$BBAF28   | A = curr lvl room type
+    INY                                ;$BBAF2B   |
+    INY                                ;$BBAF2C   | Y = rom read pointer [curr lvl settings ISD pointer]
+    STA $00,x                          ;$BBAF2D   | $515 = curr lvl room type ($516 = 0)
+    CMP #$0000                         ;$BBAF2F  \  switch statement (curr lvl room type)
+    BEQ CODE_BBAF65                    ;$BBAF32   | <-- normal room type case
+    CMP #$0001                         ;$BBAF34   | 
+    BEQ CODE_BBAF58                    ;$BBAF37   | <-- bonus room type case
+    CMP #$0002                         ;$BBAF39   |
+    BEQ CODE_BBAF65                    ;$BBAF3C   | <-- small room type case
+    CMP #$0003                         ;$BBAF3E   |
+    BEQ CODE_BBAF65                    ;$BBAF41   | <-- boss room type case
+    CMP #$0004                         ;$BBAF43   |
+    BEQ CODE_BBAF55                    ;$BBAF46   | <-- unused type case
+    CMP #$0005                         ;$BBAF48   |
+    BEQ CODE_BBAF55                    ;$BBAF4B   | <-- unused type case
+    CMP #$0006                         ;$BBAF4D   |
+    BEQ CODE_BBAF65                    ;$BBAF50  /  <-- destination area type case
+
+
+
+
+
+
+registers and WRAM state at : CODE_BBAF65/CODE_BBAF58/CODE_BBAF55 start, (in part 1) :
+
+    A = [0x0] [current_level.room_type]
+    X = wram write pointer : 0x515 (current_level.room_type)
+    Y = rom read pointer : current_level_settings.ISD_pointer
+
+	$0034, 1 byte  = current_level.index
+
+    $0032, 1 byte  = current_level.unknown_byte
+    $0033, 1 byte  = 0x0
+
+    $0515, 1 byte  = current_level.room_type
+    $0516, 1 byte  = 0x0
+
+
+
+
+
+
+CODE_BBAF52:                           ;         \  case : "all" other cases (0x7 to 0xFF) / is also the exit process
+    PLB                                ;$BBAF52   | get back bank 0x80
+    CLC                                ;$BBAF53   |
+    RTL                                ;$BBAF54  /  end of process
+CODE_BBAF55:                           ;         \  case : unused type
+    PLB                                ;$BBAF55   |
+    SEC                                ;$BBAF56   |
+    RTL                                ;$BBAF57  /
+CODE_BBAF58:                           ;
+    LDA.w DATA_FD0000,y                ;$BBAF58  \  case : bonus room type
+    INY                                ;$BBAF5B   |
+    AND #$00FF                         ;$BBAF5C   |
+    SEP #$20                           ;$BBAF5F   |
+    STA $18,x                          ;$BBAF61   |
+    REP #$20                           ;$BBAF63   |
+CODE_BBAF65:                           ;         \  case : normal/small/boss room type, destination area type
+    JSR CODE_BBAFE1                    ;$BBAF65   | get for curr lvl [ISD pointer] [room index] [param_0]; test for curr lvl [param_0] [param_1]
+    JSR CODE_BBB05C                    ;$BBAF68   | get for curr lvl [param_2]
+    JSR CODE_BBB066                    ;$BBAF6B   | get for curr lvl [param_3] [param_4] [param_5]
+    TYA                                ;$BBAF6E   | A = rom read pointer [curr lvl spawn_point_0 flags] (curr lvl spawn_point_list start)
+    STA $1C,x                          ;$BBAF6F   | $531 = rom read pointer [curr lvl spawn_point_list start, spawn_point_0 flags]
+    STZ $26,x                          ;$BBAF71   | $53B = 0 (spawn_point counter)
+    LDA $32                            ;$BBAF73   | A = curr lvl unknown byte
+    BRA CODE_BBAF7F                    ;$BBAF75  /
+
+
+
+
+
+
+
+
+
+; PART 2 :
+
+; load normal level room type
+
+
+CODE_BBAFE1:                   ;
+    LDA.w DATA_FD0000,y        ;$BBAFE1  \  A = curr lvl ISD pointer
+    INY                        ;$BBAFE4   |
+    INY                        ;$BBAFE5   | Y = rom read pointer [curr lvl room index]
+    STA $36                    ;$BBAFE6   | $36 = curr lvl ISD pointer
+    LDA.w DATA_FD0000,y        ;$BBAFE8   | A = curr lvl room index (1byte)
+    INY                        ;$BBAFEB   | Y = rom read pointer [curr lvl param_0]
+    STA $38                    ;$BBAFEC   | $38 = curr lvl room index, $39 = curr lvl param_0
+CODE_BBAFEE:                   ;          |                                                                                                                | --- simulation of possible second loop step ---
+    LDA.w DATA_FD0000,y        ;$BBAFEE   | A = [curr lvl param_1] [curr lvl param_0]                                                                      | A = [curr lvl param_4] [curr lvl param_3] 
+    BEQ CODE_BBAFFF            ;$BBAFF1   | if (curr lvl param_0 == 0 && curr lvl param_1 == 0)                                                            | if (curr lvl param_3 == 0 && curr lvl param_4 == 0)
+    INY                        ;$BBAFF3   |   then branch to CODE_BBAFFF                       else                                                        |   then branch to CODE_BBAFFF (should branch absolutly) else
+    INY                        ;$BBAFF4   |                                                        | Y = rom read pointer [curr lvl param_2]                                                                            | Y = rom read pointer [curr lvl param_5]
+    STA $39                    ;$BBAFF5   |                                                        | $39 = curr lvl param_0, $3A = curr lvl param_1                                                                     | $39 = curr lvl param_3, $3A = curr lvl param_4
+    LDA.w DATA_FD0000,y        ;$BBAFF7   |                                                        | A = [curr lvl param_3] [curr lvl param_2]                                                                          | A = [curr lvl spawn_point_0 flags] [curr lvl param_5] 
+    INY                        ;$BBAFFA   |                                                        | Y = rom read pointer [curr lvl param_3]                                                                            | Y = rom read pointer [curr lvl spawn_point_0 flags]
+    STA $3B                    ;$BBAFFB   |                                                        | $3B = curr lvl param_2, $3C = curr lvl param_3                                                                     | $3B = curr lvl param_5, $3C = curr lvl spawn_point_0 flags
+    BRA CODE_BBAFEE            ;$BBAFFD   |                                                        |                                                                                                                    | --- will loop again but that really does not make sens ! ----
+CODE_BBAFFF:                   ;          |                                                          
+    INY                        ;$BBAFFF   |                                                                                                                |
+    INY                        ;$BBB000   | Y = rom read pointer [curr lvl param_2]                                                                        | Y = rom read pointer [curr lvl param_5]
+    RTS                        ;$BBB001   |                                                                                                                |
+
+
+
+CODE_BBB05C:
+    LDA.w DATA_FD0000,y        ;$BBB05C  \  A = [curr lvl param_3] [curr lvl param_2]                                                                      | A = [curr lvl spawn_point_0 flags] [curr lvl param_5] 
+    INY                        ;$BBB05F   | Y = rom read pointer [curr lvl param_3]                                                                        | Y = rom read pointer [curr lvl spawn_point_0 flags]
+    AND #$00FF                 ;$BBB060   | A = curr lvl param_2                                                                                           | A = curr lvl param_5
+    STA $0C,x                  ;$BBB063   | $521 = curr lvl param_2, $522 = 0                                                                              | $521 = curr lvl param_5, $522 = 0   
+    RTS                        ;$BBB065  /                                                                                                                 | 
+
+
+
+CODE_BBB066:
+    LDA.w DATA_FD0000,y        ;$BBB066  \  A = [curr lvl param_4] [curr lvl param_3]                                                                      | A = [curr lvl spawn_point_0 Xpos] [curr lvl spawn_point_0 flags]
+    INY                        ;$BBB069   |                                                                                                                | 
+    INY                        ;$BBB06A   | Y = rom read pointer [curr lvl param_5]                                                                        | Y = rom read pointer [curr lvl spawn_point_0 Ypos]
+    STA $38,x                  ;$BBB06B   | $54D = curr lvl param_3 , $54E = curr lvl param_4                                                              | 
+    LDA.w DATA_FD0000,y        ;$BBB06D   | A = [curr lvl spawn_point_0 flags] [curr lvl param_5]                                                          | I'm stopping the simulation here because that makes NO sense.
+    INY                        ;$BBB070   | Y = rom read pointer [curr lvl spawn_point_0 flags]                                                            | 
+    AND #$00FF                 ;$BBB071   | A = curr lvl param_5                                                                                           | 
+    STA $3A,x                  ;$BBB074   | $54F = curr lvl param_5 (, $550 = 0)                                                                           | 
+    RTS                        ;$BBB076  /                                                                                                                 | 
+
+
+
+
+
+
+
+case : normal/small/boss room type, destination area type
+registers and WRAM state at CODE_BBAF7F start, (in part 3) :
+
+    $0036, 2 bytes = current_level.ISD_pointer
+
+    $0038, 1 byte  = current_level.room_index
+    $0039, 1 byte  = current_level.param_0
+
+    $0521, 1 byte  = current_level.param_2
+    $0522, 1 byte  = 0x0
+
+    $054D, 1 byte  = current_level.param_3
+    $054E, 1 byte  = current_level.param_4
+
+    $054F, 1 byte  = current_level.param_5
+    $0550, 1 byte  = 0x0
+
+    $0531, 1 byte  = rom read pointer [current_level.spawn_point_list start, (spawn_point_0 flags)]
+    $053B, 1 byte  = 0x0 (spawn_point counter)
+
+    Y = rom read pointer [current_level.spawn_point_list start, (spawn_point_0 flags)]
+    A = current_level.unknown_byte
+
+
+
+
+
+
+
+; PART 3
+
+; current level spawn point counting loop
+
+CODE_BBAF77:                ;
+    INC $26,x               ;$BBAF77  \
+    TYA                     ;$BBAF79   |
+    CLC                     ;$BBAF7A   |
+    ADC #$0005              ;$BBAF7B   |
+    TAY                     ;$BBAF7E   |
+CODE_BBAF7F:                ;          |
+    LDA.w DATA_FD0005,y     ;$BBAF7F  \  A = [curr lvl spawn_point_1_flags]  if not  [end spawn_point_list : 0xFF terminate byte]
+    AND #$00FF              ;$BBAF82   | 
+    CMP #$00FF              ;$BBAF85   | check 0xFF terminate
+    BEQ CODE_BBAF8E         ;$BBAF88   | if (it is the last current level spawn_point) then skip spawn point counting loop
+    DEC $32                 ;$BBAF8A   | $32 = unknown_byte($32) - 1
+    BPL CODE_BBAF77         ;$BBAF8C  /  if (unknown_byte stays positive) keep going spawn point counting loop
+                            ;            else
+
+; mainly relative to ISD
+
+CODE_BBAF8E:                ;          |
+    LDA.w DATA_FD0000,y     ;$BBAF8E   | A = [spawn_point_0 xpos] [spawn_point_0 flags]
+    SEP #$20                ;$BBAF91   |
+    STA $3B,x               ;$BBAF93   | $550 = curr lvl spawn_point_0 flags (write 1 byte)
+    REP #$20                ;$BBAF95   |
+    LDA $38                 ;$BBAF97   | A = [curr lvl param_0] [curr lvl room index]
+    AND #$00FF              ;$BBAF99   | A = curr lvl room index
+    STA $10,x               ;$BBAF9C   | $525 = curr lvl room index
+    LDA $36                 ;$BBAF9E   | A = curr lvl ISD pointer
+    PHY                     ;$BBAFA0   | push Y (curr lvl spawn_point_0_flags pointer) on the stack
+    TAY                     ;$BBAFA1   | Y = rom read pointer [curr lvl ISD]
+    JSR CODE_BBB015         ;$BBAFA2   | get for curr lvl ISD [spe eff pal settings] [effect_1] [music index] [palette pointer]
+    JSR CODE_BBB034         ;$BBAFA5   | get for curr lvl ISD [POINTER_1] [POINTER_2]
+    JSR CODE_BBB002         ;$BBAFA8   | get for curr lvl ISD [PPU render method index] [payloads index]
+    JSR CODE_BBB043         ;$BBAFAB   | get for curr lvl ISD [SGM2_UpdateTheScreen] [SGM2_ScrollingTerrain]
+    JSR CODE_BBB052         ;$BBAFAE   | get for curr lvl ISD [theme index]
+    JSR CODE_BBB077         ;$BBAFB1   | get for curr lvl ISD [SGM2_WhatView] [special attribute flags]
+    PLY                     ;$BBAFB4   | Y = rom read pointer [curr lvl spawn_point_list start](spawn_point_0_flags)
+    LDA.w DATA_FD0001,y     ;$BBAFB5   | A = curr lvl spawn_point_0_xpos
+    STA $1E,x               ;$BBAFB8   | $533 = curr lvl spawn_point_0_xpos
+    LDA.w DATA_FD0003,y     ;$BBAFBA   | A = curr lvl spawn_point_0_ypos
+    STA $20,x               ;$BBAFBD   | $535 = curr lvl spawn_point_0_ypos
+    BRA CODE_BBAFC3         ;$BBAFBF  /
+
+CODE_BBAFC1:                ;        
+    INC $26,x               ;$BBAFC1  \  $53B = increment spawn_point counter ($53B++) ; (regardless the first one, so true total-1)
+CODE_BBAFC3:                ;          |
+    TYA                     ;$BBAFC3   |
+    CLC                     ;$BBAFC4   |
+    ADC #$0005              ;$BBAFC5   | Y += 5
+    TAY                     ;$BBAFC8   | Y = rom read pointer [curr lvl spawn_point_1_flags]
+    LDA.w DATA_FD0000,y     ;$BBAFC9   | A = [curr lvl spawn_point_1_flags]  if not  [end spawn_point_list : 0xFF terminate byte]
+    AND #$00FF              ;$BBAFCC   | 
+    CMP #$00FF              ;$BBAFCF   | check 0xFF terminate
+    BNE CODE_BBAFC1         ;$BBAFD2   | if (it is not end of current level spawn_point_list) then keep going spawn point counting loop
+    INY                     ;$BBAFD4   | Y = rom read pointer [curr lvl settings destination_lvl_index_list start] (destination_lvl_index_0)
+    JSR CODE_BBB095         ;$BBAFD5   | set to zero some mem ($53D,$53F,$541,$543,$545,$547,$549,$54B) and get all destination_lvl_index
+    JSR CODE_BBB07F         ;$BBAFD8   | get curr lvl additinal_destination_0
+    JSR CODE_BBB08F         ;$BBAFDB   | save the rom read pointer (at [next additinal_destination_#(1?)]  if not  [end additinal_destination_list : 0xFFFF terminate word])
+    BRL CODE_BBAF52         ;$BBAFDE  /  end of process
+
+

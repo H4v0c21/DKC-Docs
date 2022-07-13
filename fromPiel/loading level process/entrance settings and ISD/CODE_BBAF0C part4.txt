@@ -1,0 +1,81 @@
+CODE_BBB002:
+    LDA.w DATA_FD0000,y        ;$BBB002  \  A = [curr lvl payloads index] [curr lvl PPU render method index]
+    INY                        ;$BBB005   |
+    INY                        ;$BBB006   | Y = rom read pointer [curr lvl ISD SGM2_UpdateTheScreen]
+    PHA                        ;$BBB007   | push [curr lvl PPU render method index] [curr lvl payloads index] on the stack
+    AND #$00FF                 ;$BBB008   | A = curr lvl PPU render method index
+    STA $22,x                  ;$BBB00B   | $537 = curr lvl PPU render method index, ($538 = 0)
+    PLA                        ;$BBB00D   | A = [curr lvl payloads index] [curr lvl PPU render method index]
+    XBA                        ;$BBB00E   | A = [curr lvl PPU render method index] [curr lvl payloads index]
+    AND #$00FF                 ;$BBB00F   | A = curr lvl payloads index
+    STA $24,x                  ;$BBB012   | $539 = curr lvl payloads index, ($53A = 0)
+    RTS                        ;$BBB014  /
+CODE_BBB015:                   ;         
+    LDA.w DATA_FD0000,y        ;$BBB015  \  A = curr lvl ISD special effect palette settings (SGM2_label:Palette1)
+    INY                        ;$BBB018   |
+    INY                        ;$BBB019   | Y = rom read pointer [curr lvl ISD Effect_1]
+    STA $02,x                  ;$BBB01A   | $517 = curr lvl ISD special effect palette settings
+    LDA.w DATA_FD0000,y        ;$BBB01C   | A = curr lvl ISD Effect_1 (SGM2_label:Effect1)
+    INY                        ;$BBB01F   |
+    INY                        ;$BBB020   | Y = rom read pointer [curr lvl music index]
+    STA $04,x                  ;$BBB021   | $519 = curr lvl ISD Effect_1
+    LDA.w DATA_FD0000,y        ;$BBB023   | A = curr lvl music index (SGM2_label:Music)
+    INY                        ;$BBB026   |
+    INY                        ;$BBB027   | Y = rom read pointer [curr lvl specific palette pointer]
+    STA $06,x                  ;$BBB028   | $51B = curr lvl music index
+    LDA.w DATA_FD0000,y        ;$BBB02A   | A = curr lvl specific palette pointer (SGM2_label:Palette2)
+    INY                        ;$BBB02D   |
+    INY                        ;$BBB02E   | Y = rom read pointer [curr lvl ISD POINTER_1]
+    STA $000A8E                ;$BBB02F   | $0A8E = $000A8E = curr lvl specific palette pointer
+    RTS                        ;$BBB033  /
+CODE_BBB034:                   ;         
+    LDA.w DATA_FD0000,y        ;$BBB034  \  A = curr lvl ISD POINTER_1
+    INY                        ;$BBB037   | 
+    INY                        ;$BBB038   | Y = rom read pointer [curr lvl ISD POINTER_2]
+    STA $0A,x                  ;$BBB039   | $51F = curr lvl ISD POINTER_1
+    LDA.w DATA_FD0000,y        ;$BBB03B   | A = curr lvl ISD POINTER_2
+    INY                        ;$BBB03E   |
+    INY                        ;$BBB03F   | Y = rom read pointer [curr lvl PPU render method index]
+    STA $08,x                  ;$BBB040   | $51D = curr lvl ISD POINTER_2
+    RTS                        ;$BBB042  /
+CODE_BBB043:                   ;         
+    LDA.w DATA_FD0000,y        ;$BBB043  \  A = curr lvl ISD SGM2_UpdateTheScreen
+    INY                        ;$BBB046   |
+    INY                        ;$BBB047   | Y = rom read pointer [curr lvl SGM2_ScrollingTerrain]
+    STA $12,x                  ;$BBB048   | $527 = curr lvl ISD SGM2_UpdateTheScreen
+    LDA.w DATA_FD0000,y        ;$BBB04A   | A = curr lvl SGM2_ScrollingTerrain
+    INY                        ;$BBB04D   |
+    INY                        ;$BBB04E   | Y = rom read pointer [curr lvl theme index]
+    STA $14,x                  ;$BBB04F   | $529 = curr lvl SGM2_ScrollingTerrain
+    RTS                        ;$BBB051  /
+CODE_BBB052:                   ;         
+    LDA.w DATA_FD0000,y        ;$BBB052  \  A = [curr lvl SGM2_WhatView] [curr lvl theme index]
+    INY                        ;$BBB055   | Y = rom read pointer [curr lvl SGM2_WhatView]
+    AND #$00FF                 ;$BBB056   | A = curr lvl theme index
+    STA $0E,x                  ;$BBB059   | $523 = curr lvl theme index, ($524 = 0)
+    RTS                        ;$BBB05B  /
+CODE_BBB077:                   ;         
+    LDA.w DATA_FD0000,y        ;$BBB077  \  A = [curr lvl special attribute flags] [curr lvl SGM2_WhatView]
+    INY                        ;$BBB07A   |
+    INY                        ;$BBB07B   | Y = rom read pointer [curr lvl ISD end] (end overflow on the next ISD settings start, is not on a terminate byte)
+    STA $16,x                  ;$BBB07C   | $52B = curr lvl SGM2_WhatView, $52C = curr lvl special attribute flags
+    RTS                        ;$BBB07E  /
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
