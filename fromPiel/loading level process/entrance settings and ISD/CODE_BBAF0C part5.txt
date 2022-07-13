@@ -51,8 +51,3 @@ CODE_BBB0AE:                   ;          |
     PLX                        ;$BBB0B5   | X = wram write pointer [0x515](curr lvl room type)
     RTS                        ;$BBB0B6  /
 
-
-
-
-
-End of loop or keep looping if (the last destination level index is not)
