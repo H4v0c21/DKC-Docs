@@ -78,7 +78,7 @@ registers and WRAM state at : CODE_BBAF65/CODE_BBAF58/CODE_BBAF55 start, (in par
     X = wram write pointer : 0x515 (current_level.room_type)
     Y = rom read pointer : current_level_settings.ISD_pointer
 
-	$0034, 1 byte  = current_level.index
+    $0034, 1 byte  = current_level.index
 
     $0032, 1 byte  = current_level.unknown_byte
     $0033, 1 byte  = 0x0
