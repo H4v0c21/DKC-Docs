@@ -1,0 +1,148 @@
+; very first call A from :
+
+;   called on get in room loading (from level to level room)
+;     level_number = (not updated) previous loaded level index
+;     $08A6        = (not updated) previous spawn point index
+  
+;   called on get out room loading (from level room to level)
+;     level_number = (not updated) previous loaded level index of level room
+;     $08A6        = (not updated) previous spawn point index
+
+;   called on die in level (from level to worldmap)
+;     level_number = (not updated) previous loaded level index
+;     $08A6        = (not updated) previous spawn point index
+
+;   called on goal end level loading (from level to worldmap)
+;     level_number = (not updated) previous loaded level index
+;     $08A6        = (not updated) previous spawn point index
+
+    LDA $08A6               ;$BBBE2E   | A = [0x0] [spawn point index]
+    XBA                     ;$BBBE31   | A = [spawn point index] [0x0]
+    ORA level_number        ;$BBBE32   | A = [spawn point index] [current level index]
+    JSL CODE_BBAF0C         ;$BBBE34   |
+
+;
+;
+
+; very first call B from :
+
+;   called on get in room loading (from level to level room)
+;     $053D,x = (correct) level index of level room to load
+;     $059F   = (wrong) spawn point index
+
+;   called on goal end level loading (from level to worldmap)
+;     $053D,x = next worldmap level index
+;     $059F   = spawn point index (value 0x0 (abitrary?))
+
+    LDA $059D               ;$BBBEFB   | A = destination level index slot
+    ASL A                   ;$BBBEFE   | A = destination level index slot * 2 (pointer offset)
+    TAX                     ;$BBBEFF   | X = wram read pointer [destination level index slot #]
+    LDA $053D,x             ;$BBBF00   | A = destination level index
+    AND #$01FF              ;$BBBF03   | A = destination level index
+    STA $08C8               ;$BBBF06   | $08C8 = destination level index
+    LDA $059F               ;$BBBF09   | A = [0x0] [spawn point index]
+    XBA                     ;$BBBF0C   | A = [spawn point index] [0x0]
+    ORA $08C8               ;$BBBF0D   | A = [spawn point index] [destination level index (current level index)]
+    LDX #$0553              ;$BBBF10   | X = wram write pointer [curr lvl room type]
+    JSL CODE_BBAF0F         ;$BBBF13   |
+
+
+
+
+
+; CODE_BB9210 set_someMainVars
+
+
+
+; ////////////////////////////////////////////////////////////////////////
+; multiple weird calls (which includes what we called "weird ISD process")
+
+; called on : start level loading (from worldmap to level) /
+              get in room loading (from level to level room) /
+              get out room loading (from level room to level) /
+              die in level (from level to worldmap) /
+              goal end level loading (from level to worldmap) /
+              leave level [start+select] (from level to worldmap) /
+    spawn point index = 0x0
+    level index = unknown source
+
+; weird calls A
+    LDX #$0515          ;$BB80BE   |
+    JSL CODE_BBAF0F     ;$BB80C1   |
+
+; weird calls B
+    LDX #$0553          ;$BB80DD   |
+    JSL CODE_BBAF0F     ;$BB80E0   |
+
+
+
+
+
+
+
+
+
+
+; /////////////////
+; first call from :
+
+; called on start level loading (from worldmap to level)
+;   level_number = (correct) current level to load
+;   spawn point index = (implicitly correct) 0x0
+
+; called on get in room loading (from level to level room)
+;   level_number = (correct) level index of level room to load
+;   spawn point index = (implicitly correct) 0x0
+
+; called on get out room loading (from level room to level)
+;   level_number = (correct) current level index to load
+;   spawn point index = (implicitly correct) 0x0
+
+; called on die in level (from level to worldmap)
+;   level_number = (no matter?) current loaded level index
+;   spawn point index = (no matter) (implicit) 0x0
+
+; called on goal end level loading (from level to worldmap)
+;   level_number = next worldmap level index
+;   spawn point index = (implicitly correct ?) (no matter ?) 0x0
+
+; called on leave level [start+select] (from level to worldmap)
+;   level_number = (no matter?) current loaded level index
+;   spawn point index = (implicitly correct ?) (no matter ?) 0x0
+
+    LDA level_number        ;$BB8244   | A = [0x0] [current level index]
+    JSL CODE_BBAF0C         ;$BB8246   |
+
+
+
+
+
+
+
+;
+;
+
+; ///////////////////
+(the true one call ?)
+; second call from :
+
+; called on start level loading (from worldmap to level)
+;   level_number = (correct) current level to load
+;   $08A6 = (correct) spawn point index
+
+; called on get in room loading (from level to level room)
+;   level_number = (correct) level index of level room to load
+;   $08A6 = (correct) spawn point index
+
+; called on get out room loading (from level room to level)
+;   level_number = (correct) current level index to load
+;   $08A6 = (correct) spawn point index
+
+    LDA $08A6               ;$BB927D   | A = [0x0] [spawn point index]
+    XBA                     ;$BB9280   | A = [spawn point index] [0x0]
+    ORA level_number        ;$BB9281   | A = [spawn point index] [current level index]
+    JSL CODE_BBAF0C         ;$BB9283   |
+
+
+
+

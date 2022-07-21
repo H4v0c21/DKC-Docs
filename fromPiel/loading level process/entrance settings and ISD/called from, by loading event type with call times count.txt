@@ -1,0 +1,100 @@
+start level loading (from worldmap to level)
+
+    BBBE34 (3BBE34) (very first call A) : none
+
+    BBBF13 (3BBF13) (very first call B) : none
+
+    CODE_BB9210 (set_someMainVars)      : once
+
+    BB80C1 (3B80C1) (weird call A)      : multiple times
+
+    BB80E0 (3B80E0) (weird call B)      : multiple times
+
+    BB8246 (3B8246) (first call)        : once
+
+    BB9283 (3B9283) (second call)       : once
+
+
+get in room loading (from level to level room)
+
+    BBBE34 (3BBE34) (very first call A) : once
+
+    BBBF13 (3BBF13) (very first call B) : once
+
+    CODE_BB9210 (set_someMainVars)      : once
+
+    BB80C1 (3B80C1) (weird call A)      : multiple times
+
+    BB80E0 (3B80E0) (weird call B)      : multiple times
+
+    BB8246 (3B8246) (first call)        : once
+
+    BB9283 (3B9283) (second call)       : once
+
+
+get out room loading (from level room to level)
+
+    BBBE34 (3BBE34) (very first call A) : once
+
+    BBBF13 (3BBF13) (very first call B) : none
+
+    CODE_BB9210 (set_someMainVars)      : once
+
+    BB80C1 (3B80C1) (weird call A)      : multiple times
+
+    BB80E0 (3B80E0) (weird call B)      : multiple times
+
+    BB8246 (3B8246) (first call)        : once
+
+    BB9283 (3B9283) (second call)       : once
+
+
+die in level (from level to worldmap)
+
+    BBBE34 (3BBE34) (very first call A) : once
+
+    BBBF13 (3BBF13) (very first call B) : none
+
+    CODE_BB9210 (set_someMainVars)      : none
+
+    BB80C1 (3B80C1) (weird call A)      : multiple times
+
+    BB80E0 (3B80E0) (weird call B)      : multiple times
+
+    BB8246 (3B8246) (first call)        : once
+
+    BB9283 (3B9283) (second call)       : none
+
+
+goal end level loading (from level to worldmap)
+
+    BBBE34 (3BBE34) (very first call A) : once
+
+    BBBF13 (3BBF13) (very first call B) : once
+
+    CODE_BB9210 (set_someMainVars)      : none
+
+    BB80C1 (3B80C1) (weird call A)      : multiple times
+
+    BB80E0 (3B80E0) (weird call B)      : multiple times
+
+    BB8246 (3B8246) (first call)        : once
+
+    BB9283 (3B9283) (second call)       : none
+
+
+leave level [start+select] (from level to worldmap)
+
+    BBBE34 (3BBE34) (very first call A) : none
+
+    BBBF13 (3BBF13) (very first call B) : none
+
+    CODE_BB9210 (set_someMainVars)      : none
+
+    BB80C1 (3B80C1) (weird call A)      : multiple times
+
+    BB80E0 (3B80E0) (weird call B)      : multiple times
+
+    BB8246 (3B8246) (first call)        : once
+
+    BB9283 (3B9283) (second call)       : none

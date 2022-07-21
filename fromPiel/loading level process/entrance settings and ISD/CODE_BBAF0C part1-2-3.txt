@@ -1,18 +1,6 @@
 1.1 CODE_BBAF0C
 
 
-; first call from :
-	LDA level_number     ;$BB8244   | A = [0x0] [current level index]
-	JSL CODE_BBAF0C      ;$BB8246   |
-
-; second call from :
-	LDA $08A6            ;$BB927D   | A = [0x0] [spawn point index]
-	XBA                  ;$BB9280   | A = [spawn point index] [0x0]
-	ORA level_number     ;$BB9281   | A = [spawn point index] [current level index]
-	JSL CODE_BBAF0C      ;$BB9283   |
-
-
-
 
 
 
@@ -79,6 +67,7 @@ registers and WRAM state at : CODE_BBAF65/CODE_BBAF58/CODE_BBAF55 start, (in par
     Y = rom read pointer : current_level_settings.ISD_pointer
 
     $0034, 1 byte  = current_level.index
+    $0035, 1 byte  = current_level.spawn_point_index
 
     $0032, 1 byte  = current_level.spawn_point_index
     $0033, 1 byte  = 0x0
@@ -112,7 +101,7 @@ CODE_BBAF65:                           ;         \  case : normal/small/boss roo
     JSR CODE_BBB066                    ;$BBAF6B   | get for curr lvl [param_3] [param_4] [param_5]
     TYA                                ;$BBAF6E   | A = rom read pointer [curr lvl spawn_point_list start] (curr lvl spawn_point_0 flags)
     STA $1C,x                          ;$BBAF6F   | $531 = rom read pointer [curr lvl spawn_point_list start]
-    STZ $26,x                          ;$BBAF71   | $53B = 0 (spawn_point counter)
+    STZ $26,x                          ;$BBAF71   | $53B = 0 (spawn_point counter), ($53C = 0)
     LDA $32                            ;$BBAF73   | A = curr lvl spawn point index
     BRA CODE_BBAF7F                    ;$BBAF75  /
 
@@ -134,7 +123,7 @@ CODE_BBAFE1:                   ;
     INY                        ;$BBAFE4   |
     INY                        ;$BBAFE5   | Y = rom read pointer [curr lvl room index]
     STA $36                    ;$BBAFE6   | $36 = curr lvl ISD pointer
-    LDA.w DATA_FD0000,y        ;$BBAFE8   | A = curr lvl room index (1byte)
+    LDA.w DATA_FD0000,y        ;$BBAFE8   | A = [curr lvl param_0] [curr lvl room index]
     INY                        ;$BBAFEB   | Y = rom read pointer [curr lvl param_0]
     STA $38                    ;$BBAFEC   | $38 = curr lvl room index, $39 = curr lvl param_0
 CODE_BBAFEE:                   ;          |                                                                                                                | --- simulation of possible second loop step ---
@@ -198,7 +187,9 @@ registers and WRAM state at CODE_BBAF7F start, (in part 3) :
     $0550, 1 byte  = 0x0
 
     $0531, 2 bytes = rom read pointer [current_level.spawn_point_list start]
-    $053B, 1 byte  = 0x0 (spawn_point counter)
+
+    $053B, 1 byte  = 0x0 (current_level.spawn_point_counter)
+    $053C, 1 byte  = 0x0
 
     Y = rom read pointer [current_level.spawn_point_list start]
     A = current_level.spawn_point_index
@@ -276,8 +267,8 @@ CODE_BBAFC3:                ;          |
     BNE CODE_BBAFC1         ;$BBAFD2   | if (it is not end of current level spawn_point_list) then keep going spawn point counting loop
     INY                     ;$BBAFD4   | Y = rom read pointer [curr lvl settings destination_lvl_index_list start] (destination_lvl_index_0)
     JSR CODE_BBB095         ;$BBAFD5   | set to zero some mem ($53D,$53F,$541,$543,$545,$547,$549,$54B) and get all destination_lvl_index
-    JSR CODE_BBB07F         ;$BBAFD8   | get curr lvl additinal_destination_0
-    JSR CODE_BBB08F         ;$BBAFDB   | save the rom read pointer (at [next additinal_destination_#(1?)]  if not  [end additinal_destination_list : 0xFFFF terminate word])
+    JSR CODE_BBB07F         ;$BBAFD8   | get curr lvl worldmap_connexion_0
+    JSR CODE_BBB08F         ;$BBAFDB   | save the rom read pointer (at [next worldmap_connexion_#(1?)]  if not  [end worldmap_connexion_list : 0xFFFF terminate word])
     BRL CODE_BBAF52         ;$BBAFDE  /  end of process
 
 

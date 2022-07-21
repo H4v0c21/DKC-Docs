@@ -41,12 +41,12 @@ CODE_BBB034:                   ;
 CODE_BBB043:                   ;         
     LDA.w DATA_FD0000,y        ;$BBB043  \  A = curr lvl ISD SGM2_UpdateTheScreen
     INY                        ;$BBB046   |
-    INY                        ;$BBB047   | Y = rom read pointer [curr lvl SGM2_ScrollingTerrain]
+    INY                        ;$BBB047   | Y = rom read pointer [curr lvl ISD SGM2_ScrollingTerrain]
     STA $12,x                  ;$BBB048   | $527 = curr lvl ISD SGM2_UpdateTheScreen
-    LDA.w DATA_FD0000,y        ;$BBB04A   | A = curr lvl SGM2_ScrollingTerrain
+    LDA.w DATA_FD0000,y        ;$BBB04A   | A = curr lvl ISD SGM2_ScrollingTerrain
     INY                        ;$BBB04D   |
     INY                        ;$BBB04E   | Y = rom read pointer [curr lvl theme index]
-    STA $14,x                  ;$BBB04F   | $529 = curr lvl SGM2_ScrollingTerrain
+    STA $14,x                  ;$BBB04F   | $529 = curr lvl ISD SGM2_ScrollingTerrain
     RTS                        ;$BBB051  /
 CODE_BBB052:                   ;         
     LDA.w DATA_FD0000,y        ;$BBB052  \  A = [curr lvl SGM2_WhatView] [curr lvl theme index]
