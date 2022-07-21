@@ -1,22 +1,22 @@
 
 CODE_BB8241 (first call)
 
-    A = [0x0] [current_level.index]
+	A = [0x0] [current_level.index]
 
 CODE_BB9265 (second call)
 
-    A = [current_level.spawn_point_index] [current_level.index]
+	A = [current_level.spawn_point_index] [current_level.index]
 
 
 
 	CODE_BBAF0C (entry point)
 
-        X = 0x515 if not 0x553 = (wram write pointer [current_level.room_type])
+		X = 0x515 if not 0x553 = (wram write pointer [current_level.room_type])
 
-    CODE_BBAF0F (entry point)
+	CODE_BBAF0F (entry point)
 
 		$0034, 1 byte  = current_level.index
-        $0035, 1 byte  = current_level.spawn_point_index
+		$0035, 1 byte  = current_level.spawn_point_index
 
 		$0032, 1 byte  = current_level.spawn_point_index
 		$0033, 1 byte  = 0x0
@@ -67,101 +67,101 @@ CODE_BB9265 (second call)
 
 				$0032, 2 bytes = iCurrentLoop (current_level.spawn_point_index to -1(0xFFFF))
 
-                CODE_BBAF8E
+				CODE_BBAF8E
 
-                    $0550, 1 byte  = current_level.spawn_point_#_flags
-                    $0551, 1 byte  = $0551 (unchanged)
+					$0550, 1 byte  = current_level.spawn_point_#_flags
+					$0551, 1 byte  = $0551 (unchanged)
 
-                    $0525, 1 byte  = current_level.room_index
-                    $0526, 1 byte  = 0x0
+					$0525, 1 byte  = current_level.room_index
+					$0526, 1 byte  = 0x0
 
-                    CODE_BBB015
+					CODE_BBB015
 
-                        $0517, 2 bytes = current_level.ISD_settings.special_effect_palette
+						$0517, 2 bytes = current_level.ISD_settings.special_effect_palette
 
-                        $0519, 2 bytes = current_level.ISD_settings.Effect_1
+						$0519, 2 bytes = current_level.ISD_settings.Effect_1
 
-                        $051B, 2 bytes = current_level.ISD_settings.music_index
+						$051B, 2 bytes = current_level.ISD_settings.music_index
 
-                        $0A8E, 2 bytes = current_level.ISD_settings.specific_palette_pointer
+						$0A8E, 2 bytes = current_level.ISD_settings.specific_palette_pointer
 
-                    CODE_BBB034
+					CODE_BBB034
 
-                        $051F, 2 bytes = current_level.ISD_settings.POINTER_1
+						$051F, 2 bytes = current_level.ISD_settings.POINTER_1
 
-                        $051D, 2 bytes = current_level.ISD_settings.POINTER_2
+						$051D, 2 bytes = current_level.ISD_settings.POINTER_2
 
-                    CODE_BBB002
+					CODE_BBB002
 
-                        $0537, 1 byte  = current_level.ISD_settings.PPU_render_method_index
-                        $0538, 1 byte  = 0x0
+						$0537, 1 byte  = current_level.ISD_settings.PPU_render_method_index
+						$0538, 1 byte  = 0x0
 
-                        $0539, 1 byte  = current_level.ISD_settings.payloads_index
-                        $053A, 1 byte  = 0x0
+						$0539, 1 byte  = current_level.ISD_settings.payloads_index
+						$053A, 1 byte  = 0x0
 
-                    CODE_BBB043
+					CODE_BBB043
 
-                        $0527, 2 bytes = current_level.ISD_settings.SGM2_UpdateTheScreen
+						$0527, 2 bytes = current_level.ISD_settings.SGM2_UpdateTheScreen
 
-                        $0529, 2 bytes = current_level.ISD_settings.SGM2_ScrollingTerrain
+						$0529, 2 bytes = current_level.ISD_settings.SGM2_ScrollingTerrain
 
-                    CODE_BBB052
+					CODE_BBB052
 
-                        $0523, 1 byte  = current_level.ISD_settings.theme_index
-                        $0524, 1 byte  = 0x0
+						$0523, 1 byte  = current_level.ISD_settings.theme_index
+						$0524, 1 byte  = 0x0
 
-                    CODE_BBB077
+					CODE_BBB077
 
-                        $052B, 1 byte  = current_level.ISD_settings.SGM2_WhatView
-                        $052C, 1 byte  = current_level.ISD_settings.special_attribute_flags
+						$052B, 1 byte  = current_level.ISD_settings.SGM2_WhatView
+						$052C, 1 byte  = current_level.ISD_settings.special_attribute_flags
 
-                    $0533, 2 bytes = current_level.spawn_point_#_xpos
+					$0533, 2 bytes = current_level.spawn_point_#_xpos
 
-                    $0535, 2 bytes = current_level.spawn_point_#_ypos
+					$0535, 2 bytes = current_level.spawn_point_#_ypos
 
-                    CODE_BBAFC3
+					CODE_BBAFC3
 
-                        CODE_BBAFC1
+						CODE_BBAFC1
 
-                            $053B, 1 byte  = current_level.spawn_point_counter (from spawn_point_index to spawn_point_total)
+							$053B, 1 byte  = current_level.spawn_point_counter (from spawn_point_index to spawn_point_total)
 
-                        CODE_BBB095
+						CODE_BBB095
 
-                            $53D, 2bytes = current_level.destination_level_index_slot_0 (value 0x0)
+							$53D, 2bytes = current_level.destination_level_index_slot_0 (value 0x0)
 
-                            $53F, 2bytes = current_level.destination_level_index_slot_1 (value 0x0)
+							$53F, 2bytes = current_level.destination_level_index_slot_1 (value 0x0)
 
-                            $541, 2bytes = current_level.destination_level_index_slot_2 (value 0x0)
+							$541, 2bytes = current_level.destination_level_index_slot_2 (value 0x0)
 
-                            $543, 2bytes = current_level.destination_level_index_slot_3 (value 0x0)
+							$543, 2bytes = current_level.destination_level_index_slot_3 (value 0x0)
 
-                            $545, 2bytes = current_level.destination_level_index_slot_4 (value 0x0)
+							$545, 2bytes = current_level.destination_level_index_slot_4 (value 0x0)
 
-                            $547, 2bytes = current_level.destination_level_index_slot_5 (value 0x0)
+							$547, 2bytes = current_level.destination_level_index_slot_5 (value 0x0)
 
-                            $549, 2bytes = current_level.destination_level_index_slot_6 (value 0x0)
+							$549, 2bytes = current_level.destination_level_index_slot_6 (value 0x0)
 
-                            $54B, 2bytes = current_level.destination_level_index_slot_7 (value 0x0)
+							$54B, 2bytes = current_level.destination_level_index_slot_7 (value 0x0)
 
-                            CODE_BBB0A8
+							CODE_BBB0A8
 
-                                $53D, 2bytes = current_level.destination_level_index_slot_0
+								$53D, 2bytes = current_level.destination_level_index_slot_0
 
-                                $53F, 2bytes = current_level.destination_level_index_slot_1
+								$53F, 2bytes = current_level.destination_level_index_slot_1
 
-                                $541, 2bytes = current_level.destination_level_index_slot_2
+								$541, 2bytes = current_level.destination_level_index_slot_2
 
-                                $543, 2bytes = current_level.destination_level_index_slot_3
+								$543, 2bytes = current_level.destination_level_index_slot_3
 
-                                $545, 2bytes = current_level.destination_level_index_slot_4
+								$545, 2bytes = current_level.destination_level_index_slot_4
 
-                                $547, 2bytes = current_level.destination_level_index_slot_5
+								$547, 2bytes = current_level.destination_level_index_slot_5
 
-                                $549, 2bytes = current_level.destination_level_index_slot_6
+								$549, 2bytes = current_level.destination_level_index_slot_6
 
-                                $54B, 2bytes = current_level.destination_level_index_slot_7
-                                
-                        CODE_BBB07F
-                        CODE_BBB08F
-                        CODE_BBAF52
+								$54B, 2bytes = current_level.destination_level_index_slot_7
+								
+						CODE_BBB07F
+						CODE_BBB08F
+						CODE_BBAF52
 
