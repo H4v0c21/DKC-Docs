@@ -50,12 +50,20 @@
 
 
 
+
+
+
 ; CODE_BB9210 set_someMainVars
+; (mentioned as landmark/markpoint in the loading process)
+
+
+
+
 
 
 
 ; ////////////////////////////////////////////////////////////////////////
-; multiple weird calls (which includes what we called "weird ISD process")
+; multiple calls in CODE_BB80B4 (get_lvl_bonus_completion routine)
 
 ; called on : start level loading (from worldmap to level) /
               get in room loading (from level to level room) /
@@ -64,13 +72,14 @@
               goal end level loading (from level to worldmap) /
               leave level [start+select] (from level to worldmap) /
     spawn point index = 0x0
-    level index = unknown source
+    level index = "all levels of the game"
+    level index = "each destination of all game's levels"
 
-; weird calls A
+; call loop (all lvl_index loop)
     LDX #$0515          ;$BB80BE   |
     JSL CODE_BBAF0F     ;$BB80C1   |
 
-; weird calls B
+; call loop (all destination lvl_index loop)
     LDX #$0553          ;$BB80DD   |
     JSL CODE_BBAF0F     ;$BB80E0   |
 

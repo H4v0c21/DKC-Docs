@@ -1,0 +1,454 @@
+
+
+                                ; init level loop process
+                                ; (init "level loop" process)
+                                ; ("level loop" counter is lvl_index_loop_counter)
+                                ; (for each level of "all level list", use "level loop" counter as 'lvl index')
+                                ; /////////////////////////////////////////////////////////////////////////////
+CODE_BB819F:                    ;        
+    STZ $0904                   ;$BB819F   | $0904 = complete_percent = 0x0, ($0905 = 0x0 ?)
+    LDA #$0001                  ;$BB81A2   | A = 0x0001
+    STA $72                     ;$BB81A5   | $72 = lvl_index_loop_counter = 0x1, ($73 = 0x0 ?)
+
+
+                                ; start new level loop step
+                                ; (start new "level loop" step)
+                                ; (get the newly incremented "level loop" counter)
+                                ; ////////////////////////////////////////////////
+CODE_BB81A7:                    ;           
+    LDA $72                     ;$BB81A7   |  A = lvl_index_loop_counter
+
+
+                                ; skip some level
+                                ; (skip 'lvl index : 0x9B' of "all level list")
+                                ; (0x9B already done by skiping 0x9A in previous get_lvl_bonus_completion() call)
+                                ; /////////////////////////////
+                                ;
+    CMP #$009B                  ;$BB81A9   |  if (lvl_index_loop_counter is 0x9B)
+    BEQ CODE_BB81BC             ;$BB81AC   |    then goto "next level loop step"
+
+
+                                ; get level's bonus stage stat counter
+                                ; (get count of 'bonus stage' and 'uncompleted bonus stage')
+                                ; (bonus stat counts relavive to 'the level' of lvl_index_loop_counter)
+                                ; ////////////////////////////////////////////////////////
+                                ;
+    JSL CODE_BB80B4             ;$BB81AE   |  get_lvl_bonus_completion() routine call
+                                ;          |  (arg A = lvl_index_loop_counter)
+                                ;          |  (return A = [bonus_count] [uncompleted_bonus_count])
+
+
+                                ; check the bonus count
+                                ; /////////////////////
+                                ;
+    BEQ CODE_BB81BC             ;$BB81B2   |  if (there is no 'bonus stage' in 'the level')
+                                ;          |    then goto "next level loop step"
+
+
+                                ; check the uncompleted bonus count
+                                ; /////////////////////////////////
+                                ;
+    AND #$00FF                  ;$BB81B4   | A = uncompleted_bonus_count
+    BNE CODE_BB81BC             ;$BB81B7   | if (there is no 'uncompleted bonus stage' in 'the level')
+    INC $0904                   ;$BB81B9   |    $0904 = complete_percent++
+
+
+                                ; next level loop step
+                                ; (next "level loop" step)
+                                ; (increment "level loop" counter and check loop condition)
+                                ; ///////////////////////////////////////////////////////
+CODE_BB81BC:                    ;          
+    INC $72                     ;$BB81BC   | $72 = lvl_index_loop_counter++
+    LDA $72                     ;$BB81BE   | A = lvl_index_loop_counter
+    ASL A                       ;$BB81C0   | A = lvl_index_loop_counter * 2 = lvl_#_settings_offset
+    TAX                         ;$BB81C1   | X = rom read pointer [lvl_#_settings_offset]
+    LDA.l DATA_FD0000,x         ;$BB81C2   | A = lvl_#_settings_pointer
+    BNE CODE_BB81A7             ;$BB81C6   | loop condition [while lvl_#_settings_pointer in not end of "all level list"]
+
+
+                                ; ????????????????????????????????
+                                ; (this block is out of the process)
+                                ; ////////////////////////////////
+                                ;
+    LDA #$59F2                  ;$BB81C8   |
+    STA $26                     ;$BB81CB   |
+    LDA #$007E                  ;$BB81CD   | unknown code block
+    STA $28                     ;$BB81D0   | not investigated yet
+    LDY #$0000                  ;$BB81D2   |
+    LDA #$0010                  ;$BB81D5   |
+    STA $5E                     ;$BB81D8   |
+
+
+///////////////////////////////
+//// REFERENCES ///////////////
+///////////////////////////////
+
+DATA_FD0000 : "all level list"
+CODE_BB81A7 : "level loop"
+CODE_BB81BC : "next level loop step"
+
+$0904 : complete_percent
+$0072 : lvl_index_loop_counter
+$00B1 : bonus_count
+$00B0 : uncompleted_bonus_count
+
+A : ""multiple usage""
+X : lvl_#_settings_pointer
+Y : ""unused""
+
+CODE_BB80B4 : get_lvl_bonus_completion()
+///////////////////////////////
+
+
+
+
+
+                                ; get_lvl_bonus_completion() routine start :
+                                ; //////////////////////////////////////////
+
+
+                                ; skip level 0x9A
+                                ; (skip 'level 0x9A' and process for 'level 0x9B' directly)
+                                ; /////////////////////////////////////////////////////////
+CODE_BB80B4:                    ;
+    CMP #$009A                  ;$BB80B4   | test A
+    BNE CODE_BB80BA             ;$BB80B7   | if(lvl_index_loop_counter is 0x9A)
+    INC A                       ;$BB80B9   |   then A++ (A = 0x9B)
+
+
+                                ; init bonus stage stat counters to zero
+                                ; //////////////////////////////////////
+CODE_BB80BA:                    ;          
+    STZ $B0                     ;$BB80BA   | uncompleted_bonus_count = 0x0
+    STZ $B2                     ;$BB80BC   | bonus_count = 0x0
+
+
+                                ; load level settings
+                                ; (load 'level settings' of 'the level')
+                                ; (use A = lvl_index_loop_counter, as 'lvl index')
+                                ; /////////////////////////////////////////////////
+                                ;
+    LDX #$0515                  ;$BB80BE   | X = wram write pointer [lvl_settings] (0x515)
+    JSL CODE_BBAF0F             ;$BB80C1   | load_lvl_settings() routine call
+                                ;          | (arg A = 'lvl index')
+                                ;          | (arg X = lvl_settings pointer)
+                                ;          | (load lvl_settings at $515 to $552)
+
+
+                                ; skip some level type
+                                ; (skip not 'normal' level and skip not 'destination area' level)
+                                ; (test lvl_settings.type : normal/destArea)
+                                ; ///////////////////////////////////////////////////////////////
+                                ;
+    LDA $0515                   ;$BB80C5   | A = lvl_settings.type
+    CMP #$0000                  ;$BB80C8   | if (lvl_settings.type is 'normal')
+    BEQ CODE_BB80D4             ;$BB80CB   |   then goto "destination slot loop"
+    CMP #$0006                  ;$BB80CD   | if (lvl_settings.type is 'destArea')
+    BEQ CODE_BB80D4             ;$BB80D0   |   then goto "destination slot loop"
+
+
+                                ; skip the level
+                                ; (skip 'the level' (default exit))
+                                ; (exit if lvl_settings.type is bonus/smallRoom/boss/unused/unused)
+                                ;
+    BRA CODE_BB8110             ;$BB80D2   | end of get_lvl_bonus_completion()
+                                ;          | goto "force exit on wrong level type"
+
+
+///////////////////////////////
+//// REFERENCES ///////////////
+///////////////////////////////
+
+CODE_BB80D4 : "destination slot loop"
+CODE_BB8110 : "force exit on wrong level type"
+
+$00B0 : uncompleted_bonus_count
+$00B2 : bonus_count
+
+$0515 : lvl_settings.type
+($0515 to $0552 : lvl_settings)
+
+A : ""multiple usage""
+X : ""arg of routine""
+Y : ""unused""
+
+CODE_BBAF0F : load_lvl_settings()
+///////////////////////////////
+
+
+
+
+
+                                ; destination slot loop
+                                ; ////////////////////////////
+
+
+                                ; init destination slot loop process
+                                ; (init "destination slot loop" process)
+                                ; (for each slot_# of lvl_settings.destination_list)
+                                ; (slot_# hold 'lvl index')
+                                ; (loop from last (slot_7) to first (slot_0))
+                                ; //////////////////////////////////////////////////
+                                ;
+CODE_BB80D4:
+    LDX #$000E                  ;$BB80D4   | X = wram read pointer [slot_7]
+
+
+                                ; start new destination slot loop step
+                                ; (start new "destination slot loop" step)
+                                ;
+CODE_BB80D7:                    ;          |
+    PHX                         ;$BB80D7   | keep X [slot_# pointer] on the stack
+
+
+                                ; skip some destination level
+                                ; (skip 'lvl index : 0 (webwood unused)' (empty slot))
+                                ; //////////////////////////////////////////////////
+                                ;
+    LDA $053D,x                 ;$BB80D8   | A = slot_#
+    BEQ CODE_BB8103             ;$BB80DB   | if (slot_# is 'lvl index : 0')
+                                ;          |   then goto "next destination slot loop step"
+
+
+                                ; load destination level settings
+                                ; (load 'destination level settings' of 'lvl index' in slot_#)
+                                ; ///////////////////////////////////////////
+                                ;
+    LDX #$0553                  ;$BB80DD   | X = wram write pointer [dstlvl_settings] (0x553)
+    JSL CODE_BBAF0F             ;$BB80E0   | load_lvl_settings() routine call 
+                                ;          | (arg A = 'lvl index')
+                                ;          | (arg X = dstlvl_settings pointer)
+                                ;          | (load dstlvl_settings at $553 to $590)
+
+
+                                ; skip destination level without bonus room type
+                                ; (skip 'destination level' that are not 'bonus stage' type)
+                                ; (test dstlvl_settings.type : bonus)
+                                ; //////////////////////////////////////////////////////////
+                                ;
+    LDA $0553                   ;$BB80E4   | A = dstlvl_settings.type
+    CMP #$0001                  ;$BB80E7   | if (dstlvl_settings.type is not 'bonus')
+    BNE CODE_BB8103             ;$BB80EA   |   then goto "next destination slot loop step"
+
+
+                                ; skip bonus level without correct bonus goal
+                                ; (skip bonus stage that are not 'destroyAll/collectStars/findToken')
+                                ; (test dstlvl_settings.bonus_type : destroyAll/collectStars/findToken)
+                                ; /////////////////////////////////////////////////////////////////////
+                                ;
+    LDA $056B                   ;$BB80EC   | A = dstlvl_settings.bonus_type
+    AND #$00FF                  ;$BB80EF   | if (dstlvl_settings.bonus_type is not destroyAll/collectStars/findToken)
+    BEQ CODE_BB8103             ;$BB80F2   |   then goto "next destination slot loop step"
+
+
+                                ; count the number of bonus stage
+                                ; (increment bonus_count)
+                                ; /////////////////////
+                                ;
+    INC $B2                     ;$BB80F4   | bonus_count++
+
+
+                                ; get level index of slot
+                                ; (get '(bonus) lvl index' of slot_#)
+                                ; ///////////////////////////
+                                ;
+    PLX                         ;$BB80F6   | X = wram read pointer [slot_#]
+    LDA $053D,x                 ;$BB80F7   | A = slot_#
+    PHX                         ;$BB80FA   | keep X [slot_# pointer] on the stack
+
+
+                                ; get bonus completion status
+                                ; (get the bonus stage completion status : completed/uncompleted)
+                                ; ///////////////////////////////////////////////////////////////
+                                ;
+    JSL CODE_BB8116             ;$BB80FB   | get_bonus_completion() routine call
+                                ;          | (arg A = '(bonus) lvl index' = slot_#)
+                                ;          | (return carry = 1:completed / 0:uncompleted)
+
+
+                                ; skip completed bonus
+                                ; (check bonus completion, and skip completed bonus stage)
+                                ; ////////////////////////////////////////////////////////
+                                ;
+    BCS CODE_BB8103             ;$BB80FF   | if (bonus is completed)
+                                ;          |   then goto "next destination slot loop step"
+
+
+                                ; count the number of uncompleted bonus
+                                ; (increment uncompleted_bonus_count)
+                                ; /////////////////////////////////////
+                                ;
+    INC $B0                     ;$BB8101   | uncompleted_bonus_count++
+
+
+                                ; next destination slot loop step
+                                ; (next "destination slot loop" step)
+                                ; (decrement X (by minus 2) pointer as "destination slot loop" counter and check condition loop)
+                                ; /////////////////////////////////////////////////////////////////////////////////
+                                ;
+CODE_BB8103:                    ;
+    PLX                         ;$BB8103   | X = wram read pointer [slot_#]
+    DEX                         ;$BB8104   |
+    DEX                         ;$BB8105   | X = wram read pointer -2 [slot_#-1]
+    BPL CODE_BB80D7             ;$BB8106   | if (X is greater than 0x0000)
+                                ;          |   then goto "start new destination slot loop step"
+
+
+                                ; end of destination slot loop
+                                ; (return step)
+                                ; ////////////////////////////
+                                ;
+    LDA $B2                     ;$BB8108   | A = [0x0] [bonus_count]
+    XBA                         ;$BB810A   | A = [bonus_count] [0x0]
+    ORA $B0                     ;$BB810B   | A = [bonus_count] [uncompleted_bonus_count]
+    STA $B0                     ;$BB810D   | $B0 = uncompleted_bonus_count, $B1 = bonus_count
+    RTL                         ;$BB810F   | return A = [bonus_count] [uncompleted_bonus_count]
+
+
+                                ; force exit on wrong level type
+                                ; (exit on not 'normal'/'destArea' lvl type)
+                                ; (skip to the next lvl of "all level list")
+                                ; (return zero as bonus completion stat counters)
+                                ; ///////////////////////////////////////////////
+CODE_BB8110:                    ;
+    LDA #$0000                  ;$BB8110  \  A = [bonus_count=0x0] [uncompleted_bonus_count=0x0]
+    RTL                         ;$BB8113  /  return A
+
+
+///////////////////////////////
+//// REFERENCES ///////////////
+///////////////////////////////
+CODE_BB80D7 : "start new destination slot loop step"
+CODE_BB8103 : "next destination slot loop step"
+
+$053D : lvl_settings.destination_list
+
+$0553 : dstlvl_settings.type
+$056B : dstlvl_settings.bonus_type
+($0553 to $0590 : dstlvl_settings)
+
+$B0 : uncompleted_bonus_count
+$B1 : bonus_count (""multiple usage"")
+$B2 : bonus_count
+
+A : ""multiple usage""
+X : wram read pointer [slot_#]
+slot_# : '(destination) lvl index'
+Y : ""unused""
+
+CODE_BB8116 : get_bonus_completion()
+///////////////////////////////
+
+
+
+
+
+                           ; get_bonus_completion() routine start :
+                           ; //////////////////////////////////////
+
+
+                           ; get bonus completion save file references
+                           ; (get the flag bit mask corresponding to '(bonus) lvl index')
+                           ; (get the save bit byte offset corresponding to '(bonus) lvl index')
+                           ; ///////////////////////////////////////////////////////////////////
+CODE_BB8116:               ;          
+    JSR CODE_BB8169        ;$BB8116   | get_bonus_completion_sram_refs() routine call
+                           ;          | (arg A = '(bonus) lvl index')
+                           ;          | (return $60 = bonus_completion_flag_bit_mask)
+                           ;          | (return X = ram read pointer ['bonus completion bit save byte'])
+
+
+                           ; get bonus completion bit save byte
+                           ; ('bonus completion bit save byte' in "bonus completion bit save byte range")
+                           ; /////////////////////////////////////////////////////////////////////
+                           ;
+    LDA.l $7E59B2,x        ;$BB8119   | A = 'bonus completion bit save byte'
+
+
+                           ; check bonus completion with save file data
+                           ; //////////////////////////////////////////
+                           ;
+    AND $60                ;$BB811D   | A = 'bonus completion bit save byte' & bonus_completion_flag_bit_mask
+    BNE CODE_BB8123        ;$BB811F   | if (bonus is uncompleted)
+    CLC                    ;$BB8121   |   then return carry = 0
+    RTL                    ;$BB8122   |
+CODE_BB8123:               ;
+    SEC                    ;$BB8123   | else
+    RTL                    ;$BB8124   |   then return carry = 1
+
+
+///////////////////////////////
+//// REFERENCES ///////////////
+///////////////////////////////
+$7E59B2 : "bonus completion bit save byte range"
+($7E59B2+X : 'bonus completion bit save byte')
+
+$60 : bonus_completion_flag_bit_mask
+
+carry : 'bonus completion status'
+
+A : ""multiple usage""
+X : ram read pointer ['bonus completion bit save byte']
+Y : ""unused""
+
+CODE_BB8169 : get_bonus_completion_sram_refs()
+///////////////////////////////
+
+
+
+
+
+                               ; get_bonus_completion_sram_refs() routine start
+                               ; //////////////////////////////////////////////
+
+
+                               ; keep '(bonus) lvl index' in $5E
+                               ; ///////////////////////////////
+CODE_BB8169:                   ;
+    STA $5E                    ;$BB8169   | $5E = '(bonus) lvl index'
+
+
+                               ; get the flag bit mask corresponding to bonus level index
+                               ; ////////////////////////////////////////////////////////
+                               ;
+    AND #$000F                 ;$BB816B   | A = low nibble of '(bonus) lvl index'
+    ASL A                      ;$BB816E   | A = (low nibble of '(bonus) lvl index') * 2 = bonus_completion_flag_bit_mask offset
+    TAX                        ;$BB816F   | X = rom read pointer [bonus_completion_flag_bit_mask]
+    LDA.l DATA_BB817F,x        ;$BB8170   | A = bonus_completion_flag_bit_mask
+    STA $60                    ;$BB8174   | $60 = bonus_completion_flag_bit_mask
+
+
+                               ; get the bit save byte pointer corresponding to bonus level index
+                               ; ////////////////////////////////////////////////////////
+                               ;
+    LDA $5E                    ;$BB8176   | A = '(bonus) lvl index'
+    LSR A                      ;$BB8178   |
+    LSR A                      ;$BB8179   |
+    LSR A                      ;$BB817A   |
+    LSR A                      ;$BB817B   | A = high nibble of '(bonus) lvl index'
+    ASL A                      ;$BB817C   | A = (high nibble of '(bonus) lvl index') * 2 = 'bonus completion bit save byte' offset
+    TAX                        ;$BB817D   | X = ram read pointer ['bonus completion bit save byte']
+    RTS                        ;$BB817E   |
+
+
+                               ; 16 bit mask table
+                               ; /////////////////
+DATA_BB817F:
+    db $01, $00, $02, $00, $04, $00, $08, $00
+    db $10, $00, $20, $00, $40, $00, $80, $00
+    db $00, $01, $00, $02, $00, $04, $00, $08
+    db $00, $10, $00, $20, $00, $40, $00, $80
+
+
+///////////////////////////////
+//// REFERENCES ///////////////
+///////////////////////////////
+DATA_BB817F : "16 bit mask table"
+
+$5E : '(bonus) lvl index'
+$60 : bonus_completion_flag_bit_mask
+
+A : ""multiple usage""
+X : ram read pointer ['bonus completion bit save byte']
+Y : ""unused""
+///////////////////////////////

@@ -1,3 +1,5 @@
+(0x515 to 0x0552 : current_level (main_settings and ISD_settings))
+
 
 CODE_BB8241 (first call)
 
@@ -11,7 +13,7 @@ CODE_BB9265 (second call)
 
 	CODE_BBAF0C (entry point)
 
-		X = 0x515 if not 0x553 = (wram write pointer [current_level.room_type])
+		X = 0x515 = (wram write pointer [current_level.room_type])
 
 	CODE_BBAF0F (entry point)
 
@@ -26,7 +28,8 @@ CODE_BB9265 (second call)
 
 		CODE_BBAF58 (bonus room type)
 
-			to do : ($18,x)
+			$052D, 1 byte  = current_level.bonus_type
+			$052E, 1 byte  = $052E (unchanged)
 
 		CODE_BBAF65 (normal/small/boss room type, destination area type)
 
@@ -127,39 +130,39 @@ CODE_BB9265 (second call)
 
 						CODE_BBB095
 
-							$53D, 2bytes = current_level.destination_level_index_slot_0 (value 0x0)
+							$053D, 2bytes = current_level.destination_level_index_slot_0 (value 0x0)
 
-							$53F, 2bytes = current_level.destination_level_index_slot_1 (value 0x0)
+							$053F, 2bytes = current_level.destination_level_index_slot_1 (value 0x0)
 
-							$541, 2bytes = current_level.destination_level_index_slot_2 (value 0x0)
+							$0541, 2bytes = current_level.destination_level_index_slot_2 (value 0x0)
 
-							$543, 2bytes = current_level.destination_level_index_slot_3 (value 0x0)
+							$0543, 2bytes = current_level.destination_level_index_slot_3 (value 0x0)
 
-							$545, 2bytes = current_level.destination_level_index_slot_4 (value 0x0)
+							$0545, 2bytes = current_level.destination_level_index_slot_4 (value 0x0)
 
-							$547, 2bytes = current_level.destination_level_index_slot_5 (value 0x0)
+							$0547, 2bytes = current_level.destination_level_index_slot_5 (value 0x0)
 
-							$549, 2bytes = current_level.destination_level_index_slot_6 (value 0x0)
+							$0549, 2bytes = current_level.destination_level_index_slot_6 (value 0x0)
 
-							$54B, 2bytes = current_level.destination_level_index_slot_7 (value 0x0)
+							$054B, 2bytes = current_level.destination_level_index_slot_7 (value 0x0)
 
 							CODE_BBB0A8
 
-								$53D, 2bytes = current_level.destination_level_index_slot_0
+								$053D, 2bytes = current_level.destination_level_index_slot_0
 
-								$53F, 2bytes = current_level.destination_level_index_slot_1
+								$053F, 2bytes = current_level.destination_level_index_slot_1
 
-								$541, 2bytes = current_level.destination_level_index_slot_2
+								$0541, 2bytes = current_level.destination_level_index_slot_2
 
-								$543, 2bytes = current_level.destination_level_index_slot_3
+								$0543, 2bytes = current_level.destination_level_index_slot_3
 
-								$545, 2bytes = current_level.destination_level_index_slot_4
+								$0545, 2bytes = current_level.destination_level_index_slot_4
 
-								$547, 2bytes = current_level.destination_level_index_slot_5
+								$0547, 2bytes = current_level.destination_level_index_slot_5
 
-								$549, 2bytes = current_level.destination_level_index_slot_6
+								$0549, 2bytes = current_level.destination_level_index_slot_6
 
-								$54B, 2bytes = current_level.destination_level_index_slot_7
+								$054B, 2bytes = current_level.destination_level_index_slot_7
 								
 						CODE_BBB07F
 						CODE_BBB08F

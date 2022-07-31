@@ -84,17 +84,20 @@ CODE_BBAF52:                           ;         \  case : "all" other cases (0x
     PLB                                ;$BBAF52   | get back bank 0x80
     CLC                                ;$BBAF53   |
     RTL                                ;$BBAF54  /  end of process
+
 CODE_BBAF55:                           ;         \  case : unused type
     PLB                                ;$BBAF55   |
     SEC                                ;$BBAF56   |
     RTL                                ;$BBAF57  /
-CODE_BBAF58:                           ;
-    LDA.w DATA_FD0000,y                ;$BBAF58  \  case : bonus room type
-    INY                                ;$BBAF5B   |
-    AND #$00FF                         ;$BBAF5C   |
-    SEP #$20                           ;$BBAF5F   |
-    STA $18,x                          ;$BBAF61   |
-    REP #$20                           ;$BBAF63   |
+
+CODE_BBAF58:                           ;            case : bonus room type
+    LDA.w DATA_FD0000,y                ;$BBAF58  \  A = [ISD pointer (highByte)] [curr lvl bonus room type]
+    INY                                ;$BBAF5B   | Y = rom read pointer [curr lvl ISD pointer]
+    AND #$00FF                         ;$BBAF5C   | A = [0x0] [curr lvl bonus room type]
+    SEP #$20                           ;$BBAF5F   | A = [curr lvl bonus room type]
+    STA $18,x                          ;$BBAF61   | $52D($56B) = curr lvl bonus room type ($52E is unchanged)
+    REP #$20                           ;$BBAF63  /  A = [0x0] [curr lvl bonus room type]
+    
 CODE_BBAF65:                           ;         \  case : normal/small/boss room type, destination area type
     JSR CODE_BBAFE1                    ;$BBAF65   | get for curr lvl [ISD pointer] [room index] [param_0]; test for curr lvl [param_0] [param_1]
     JSR CODE_BBB05C                    ;$BBAF68   | get for curr lvl [param_2]
