@@ -1,0 +1,207 @@
+DKC2 : 1.1
+level loading process : main call hierarchy
+
+doc completion : work in progress
+------------------------------------------
+0xROM
+ $CPU    label_name  ;// commentary
+------------------------------------------
+
+//////// label convension //////////
+already_named_in_the_disassembly
+CODE_HEXADDRESS__my_observation_name
+DATA_HEXADDRESS__my_observation_name
+__my_observation_name
+__my_observation_notSureName
+////////////////////////////////////
+
+
+0x0087E1
+ $8087E1 CODE_8087E1
+
+	0x0087E3
+	 $8087E3 disable_screen
+
+	0x0087E7
+	 $8087E7 CODE_BB9210__set_someMainVars
+
+		0x3B819F
+		 $BB819F CODE_BB819F__get_complete_percent ;// and load current_lvl_settings (with spawn_point as zero)
+
+			0x3B81A2
+			 $BB81A2 __check_bonus_stages
+
+				0x3B81AE
+				 $BB81AE CALL CODE_BB80B4__get_lvl_bonus_completion
+
+					0x3B80C1
+					 $BB80C1 CALL CODE_BBAF0F__load_level_entrance_settings_and_ISD__at_X ;// X: $515:lvl_loop
+
+						DETAIL IN ITS OWN DOC
+
+					0x3B80E0
+					 $BB80E0 CALL CODE_BBAF0F__load_level_entrance_settings_and_ISD__at_X ;// X: $553:bonus_loop
+
+						DETAIL IN ITS OWN DOC
+
+					0x3B80FB
+					 $BB80FB CALL CODE_BB8116__get_bonus_completion
+
+						0x3B8116
+						 $BB8116 CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+			0x3B81C8
+			 $BB81C8 __check_ended_levels
+
+				NO CALL
+
+			0x3B81F6
+			 $BB81F6 __check_boss_stages
+
+				0x3B81FC
+				 $BB81FC CALL CODE_BB824B__update_boss_lvl_completion ;// Krow's Nest
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+				0x3B8205
+				 $BB8205 CALL CODE_BB824B__update_boss_lvl_completion ;// Kleever's Kiln
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+				0x3B820E
+				 $BB820E CALL CODE_BB824B__update_boss_lvl_completion ;// Kreepy Krow
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+				0x3B8217
+				 $BB8217 CALL CODE_BB824B__update_boss_lvl_completion ;// King Zing Sting
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+				0x3B8220
+				 $BB8220 CALL CODE_BB824B__update_boss_lvl_completion ;// Kudgel's Kontest
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+				0x3B8229
+				 $BB8229 CALL CODE_BB824B__update_boss_lvl_completion ;// K.Rool Duel
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+				0x3B8232
+				 $BB8232 CALL CODE_BB824B__update_boss_lvl_completion ;// Krocodile Kore
+
+					0x3B824B
+					 $BB824B CALL CODE_BB825C__get_ended_lvl_completion
+
+						0x3B825C
+						 $BB825C CALL CODE_BB8169__get_lvl_completion_sram_refs
+
+							NO CALL
+
+			0x3B8235
+			 $BB8235 __check_kong_family_rooms
+
+				NO CALL
+
+			0x3B8244
+			 $BB8244 __load_current_level_main_settings__1stCall_BB8246
+
+				0x3B8244
+				 $BB8244 CALL CODE_BBAF0C__load_level_entrance_settings_and_ISD__at_0x515
+
+					DETAIL IN ITS OWN DOC
+
+		0x3B9214
+		 $BB9214 CALL clear_noncritical_wram
+
+		0x3B9218
+		 $BB9218 __set_someMainFlags
+
+			NO CALL
+
+		0x3B9224
+		 $BB9224 __set_playerMapObjectAttributes ;// set address/attribute/unknown for diddy and dixie map object
+
+			0x3B9227
+			 $BB9227 CALL CODE_808837__set_playerMapObjectAttributes
+
+				0x008837
+				 $808837 CALL CODE_80883B__set_current_and_second_kong
+
+					0x00885F
+					 $80885F CALL CODE_808889__set_attribute_for_current_and_second_kong ;// diddy as current and dixie as second
+
+						NO CALL
+
+					0x008885
+					 $808885 CALL CODE_808889__set_attribute_for_current_and_second_kong ;// dixie as current and diddy as second
+
+						NO CALL
+
+		0x3B922B
+		 $BB922B __update_rngNumber
+
+			NO CALL
+
+		0x3B9231
+		 $BB9231 __redirect_animalAntics_midLvlBarrel ;// set the correct lvl_index and spawn_point for animal antics level
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

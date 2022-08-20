@@ -83,7 +83,9 @@
     LDX #$0553          ;$BB80DD   |
     JSL CODE_BBAF0F     ;$BB80E0   |
 
-
+(used for bonus completion checking step)
+(both are located in CODE_BB80B4__get_lvl_bonus_completion,
+which is called in CODE_BB819F__get_complete_percent.)
 
 
 
@@ -122,7 +124,7 @@
     LDA level_number        ;$BB8244   | A = [0x0] [current level index]
     JSL CODE_BBAF0C         ;$BB8246   |
 
-
+    (located at the very end of CODE_BB819F__get_complete_percent)
 
 
 
