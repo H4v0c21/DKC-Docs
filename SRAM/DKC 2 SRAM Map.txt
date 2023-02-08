@@ -1,0 +1,115 @@
+DONKEY KONG COUNTRY 2 SRAM MAP:
+
+SRAM MAP:
+address	size		description
+$0000	0x8 bytes	placeholder
+$0008	0x2A8 bytes	file 1 data
+$02B0	0x2A8 bytes	file 2 data
+$0558	0x2A8 bytes	file 3 data
+
+SAVE FILE MAP:
+offset	size		description
+$0000	0x2 bytes	file checksum (SUM of words $0006-$02A2)
+$0002	0x2 bytes	file checksum (XOR of words $0006-$02A2)
+$0004	0x1 byte	which controller is playing (gets bitwise OR'd by 0x52 for some reason, probably because it's used as an extra save corruption check)
+$0005	0x1 byte	which gamemode is selected
+$0006	0x14E bytes	player 1 data
+$0154	0x14E bytes	player 2 data (used for 2 player contest)
+$02A2	0x6 bytes	unused (probably something to do with player 2 data not containing the header)
+
+PLAYER DATA MAP:
+offset	size		ram source	description
+$0000	0x4 bytes	$D5		time played
+$0004	0x1 byte	$0904		complete percentage
+$0005	0x1 byte	$08CC		number of krem coins
+$0006	0x1 byte	$08CE		number of hero coins
+$0007	0x1 byte	$08D0		number of hero coins next competitor has (hero screen)
+$0008	0x1 bytes	$D3		level number
+$0009	0x2 bytes	$08C2		some sort of game state thing (0x4000 effects if second kong is alive)
+$000B	0x2 bytes	$08C4		unknown
+$000D	0x20 bytes	$7E5972		map icons
+$002D	0x20 bytes	$7E5992		map path unlocks
+$004D	0x20 bytes	$7E59B2		bonus completion flags
+$006D	0x20 bytes	$7E59D2		hero coin collection flags
+$008D	0x20 bytes	$7E59F2		level completion flags
+$00AD	0x2 bytes	$0006B1		world map number
+$00AF	0x2 bytes	$0006AB		map node number
+$00B1	0x2 bytes	$0006A9		overworld exit location (this effects which world you come out of when exiting a subworld)
+$00B3	0x1 byte	$08A4		active kong
+$00B4	0x1 byte	$08D2		cranky dialog flags (world 1)
+$00B5	0x1 byte	$08D3		cranky dialog flags (world 2)
+$00B6	0x1 byte	$08D4		cranky dialog flags (world 3)
+$00B7	0x1 byte	$08D5		unused
+$00B8	0x1 byte	$08D6		cranky dialog flags (world 5)
+$00B9	0x1 byte	$08D7		cranky dialog flags (world 6)
+$00BA	0x1 byte	$08D8		unused
+$00BB	0x1 byte	$08D9		unused
+$00BC	0x1 byte	$08DA		cranky dialog flags (world 4 inside)
+$00BD	0x1 byte	$08DB		cranky lost world dialog flags (world 2)
+$00BE	0x1 byte	$08DC		cranky lost world dialog flags (world 3)
+$00BF	0x1 byte	$08DD		cranky lost world dialog flags (world 4)
+$00C0	0x1 byte	$08DE		cranky lost world dialog flags (world 5)
+$00C1	0x1 byte	$08DF		cranky lost world dialog flags (world 6)
+$00C2	0x1 byte	$08E0		wrinkly dialog flags (world 1)
+$00C3	0x1 byte	$08E1		wrinkly dialog flags (world 2)
+$00C4	0x1 byte	$08E2		wrinkly dialog flags (world 3)
+$00C5	0x1 byte	$08E3		wrinkly dialog flags (world 4 outside)
+$00C6	0x1 byte	$08E4		wrinkly dialog flags (world 5)
+$00C7	0x1 byte	$08E5		wrinkly dialog flags (world 6)
+$00C8	0x1 byte	$08E6		wrinkly dialog flags (world 7)
+$00C9	0x1 byte	$08E7		funky kong dialog flags (world 1)
+$00CA	0x1 byte	$08E8		funky kong dialog flags (world 2)
+$00CB	0x1 byte	$08E9		funky kong dialog flags (world 3)
+$00CC	0x1 byte	$08EA		unused
+$00CD	0x1 byte	$08EB		funky kong dialog flags (world 5)
+$00CE	0x1 byte	$08EC		funky kong dialog flags (world 6)
+$00CF	0x1 byte	$08ED		funky kong dialog flags (world 7)
+$00D0	0x1 byte	$08EE		unused
+$00D1	0x1 byte	$08EF		funky kong dialog flags (world 4 inside)
+$00D2	0x1 byte	$08F0		swanky game completion flags (world 1)
+$00D3	0x1 byte	$08F1		swanky game completion flags (world 2)
+$00D4	0x1 byte	$08F2		swanky game completion flags (world 3)
+$00D5	0x1 byte	$08F3		unused
+$00D6	0x1 byte	$08F4		swanky game completion flags (world 5)
+$00D7	0x1 byte	$08F5		swanky game completion flags (world 6)
+$00D8	0x1 byte	$08F6		unused
+$00D9	0x1 byte	$08F7		unused
+$00DA	0x1 byte	$08F8		swanky game completion flags (world 4 inside)
+$00DB	0x1 byte	$08F9		number of steps to krocodile kore (adds 1 for every lost level completed)
+$00DC	0x1 byte	$08FA		kudgel payment flags
+$00DD	0x1 byte	$08FB		visited npc screens flags
+$00DE	0x2 bytes	$08FC		world map cutscene flags
+$00E0	0x2 bytes	$08FE		unknown
+$00E2	0x2 bytes	$0900		which klubba entrance to send player to when exiting lost world (only effects path)
+$00E4	0x2 bytes	$060B		cheat flags (only BARRALAX persists)
+
+
+ADDITIONAL INFO ABOUT VARIOUS FLAGS:
+8FA	kudgel payment flags
+	0	unused
+	2	crocodile cauldron
+	3	krem quay
+	4	krazy kremland
+	5	gloomy gulch
+	6	k.rools keep
+	0654 3200
+
+8FB	visited npcs flags
+	c	cranky (+1%)
+	f	funky (+1%)
+	s	swanky (+1%)
+	w	wrinkly (+1%)
+	k	klubba (no %)
+	h	hero screen (give L+R to view screen)
+	0h0k wsfc
+
+8FC	world map cutscene flags
+	u	unknown (removes map icons and prevents player movement)
+	s	has stronghold showdown played
+	0000 s0u0
+	00000001	if this bit (0) and (bit 1) are set this will play the k.rool ladder animation immediately
+	00000010	if this bit (1) is set play the stronghold showdown cutscene
+	00000100	if this bit (2) is set remove all map icons and block player movement on map
+	00001000	if this bit (3) is set remove all map icons and block player movement on map
+
+	00010010	play k.rool falling animation (doesn't scroll screen)
